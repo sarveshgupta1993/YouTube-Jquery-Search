@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SearchVidz</title>
+
+
+<link rel="stylesheet" href="YouTubeSearchCss/jquery.fancybox.css">
+
+
+<style>
+
+*
+{
+padding:0;
+margin:0;
+}
+
+
+body
+{
+font-family:"Segoue",sans-serif;
+line-height:1.6em;
+color:#666;
+background:#e1e1e1;
+font-size:14px;
+}
+
+a
+{
+color:#333;
+text-decoration:none;
+}
+
+#container
+{
+
+width:740px;
+background:#fff;
+margin:auto;
+
+}
+.clearfix
+{
+clear:both;
+}
+
+header
+{
+
+padding:30px 20px;
+background:#f4f4f4;
+}
+
+
+header h1
+{
+
+color:#000;
+margin-bottom:5px;
+}
+
+header  span
+{
+color:#dd2826; 
+}
+
+section
+{
+padding:30px 20px 20px 20px;
+}
+
+footer
+{
+padding:20px;
+background:#f4f4f4;
+text-align:center;
+
+} 
+#seacrh-form
+{
+display:block;
+margin-bottom:15px;
+}
+
+.fieldcontainer{
+
+display:block;
+position:relative;
+width:90%;
+margin:0 auto;
+}
+
+
+
+
+.search-field
+{
+box-sizing:border-box;
+display:block;
+width:45%;
+padding:11px 7px;
+padding-right:43px;
+background:#fff;
+color:#ccc;
+border:1px solid #c8c8c8;
+font-size:1.6em;
+border-bottom-color:#d2e2e7;
+-webkit-border-radius:1px;
+-moz-border-radius:1px;
+border-radius:1px;
+-moz-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1),0 0 0 6px #f0f0f0;
+-webkit-box-shadow:inset 0 1px 2px rgba(0,0,0,0.1),0 0 0 6px #f0f0f0;
+boxshadow:inset 0 1px 2px rgba(0,0,0,0.1),0 0 0 6px #f0f0f0;
+
+
+}
+
+
+
+
+#search-btn
+{
+
+position:absolute;
+right:360px;
+top:5px;
+height:32px;
+width:32px;
+border:0;
+cursor:pointer;
+zoom:1;
+filter:alpha(opacity=65);
+opacity:0.65;
+background:transparent url(img/image2.jpg) top left no-repeat ;
+
+}
+
+
+#search-btn:hover
+{
+filter:alpha(opacity=90);
+opacity:0.9;
+}
+
+
+#results li
+{
+
+padding:10px 0;
+border-bottom:1px #ccc dotted;
+list-style:none;
+overflow:auto;
+}
+
+.list-left
+{
+float:left;
+width:20%;
+}
+
+.list-left img
+{
+width:100%;
+padding:3px;
+border:solid #ccc 1px;
+
+}
+.list-right
+{
+float:right;
+width:78%;
+
+}
+
+.cTitle
+{
+color:#dd2826;
+
+}
+
+.button-container
+{
+margin-top:25px;
+
+}
+.paging-button
+{
+background:#f4f4f4;
+padding: 8px 13px;
+border:#ccc 1px solid;
+border-radius:5px;
+color:#333;
+margin:10px;
+cursor:pointer;
+
+}
+
+
+</style>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+</script>
+<script src="YouTubeSearchJS/jquery.fancybox.pack.js"></script>
+
+<!--My Script tag-->
+
+<script>
+
+
+
+
+
+
+$(document).ready(function(){
+
+$(".fancybox").fancybox();
+
+});
+
+
+
+
+$(function(){
+
+var searchfield=$('#query');
+var icon=$('#search-btn');
+
+///focus event handler
+
+$(searchfield).on('focus',function()
+{
+
+$(this).animate({
+
+width:'100%'
+
+},400);
+
+
+$(icon).animate({
+
+right:'10px'
+
+},400);
+
+
+})
+// End od focus event Handler
+
+
+
+
+//Blur Handler
+
+
+$(searchfield).on('blur',function()
+{
+
+
+if(searchfield.val()=='')
+{
+
+$(searchfield).animate({
+
+width:'45%'
+},400,function(){});
+
+$(icon).animate({
+right:'360px'
+
+},400,function(){});
+
+
+}
+
+
+
+});  //end of blur
+
+
+$('#search-form').submit(function(e)
+{
+
+e.preventDefault();
+});
+
+
+})      //End of function 
+
+
+
+
+<!----search function-->
+function search()
+{
+
+$('#results').html('');
+$('#buttons').html('');
+
+q=$('#query').val();
+
+$.get(
+"https://www.googleapis.com/youtube/v3/search",
+{
+part:'snippet,id',
+q:q,
+type:'video',
+key:'AIzaSyBoHtRfujkOoQ6Z-8g38uuD7nx8PQbmN3M'
+
+
+},function(data)
+{
+
+var nextPageToken=data.nextPageToken;
+var prevPageToken=data.prevPageToken; 
+
+$.each(data.items,function(i,item){
+
+var output=getoutput(item);
+
+//Display Results
+$('#results').append(output);
+
+});
+
+var buttons=getButtons(prevPageToken,nextPageToken);
+
+//display buttons
+
+$('#buttons').append(buttons);
+
+
+}
+
+
+
+
+
+
+);//end of get
+
+
+
+
+} //end of search function
+
+
+
+
+// Next Page Function
+
+
+function nextPage()
+{
+
+var token=$('#next-button').data('token');
+var q=$('#next-button').data('token');
+
+
+$('#results').html('');
+$('#buttons').html('');
+
+q=$('#query').val();
+
+$.get(
+"https://www.googleapis.com/youtube/v3/search",
+{
+part:'snippet,id',
+q:q,
+pageToken:token,
+type:'video',
+key:'AIzaSyBoHtRfujkOoQ6Z-8g38uuD7nx8PQbmN3M'
+
+
+},function(data)
+{
+
+var nextPageToken=data.nextPageToken;
+var prevPageToken=data.prevPageToken; 
+
+$.each(data.items,function(i,item){
+
+var output=getoutput(item);
+
+//Display Results
+$('#results').append(output);
+
+});
+
+var buttons=getButtons(prevPageToken,nextPageToken);
+
+//display buttons
+
+$('#buttons').append(buttons);
+
+
+}
+
+
+
+
+
+
+);//end of get
+
+
+
+
+
+
+
+}
+
+
+
+//previous function
+
+
+
+
+function prevPage()
+{
+
+var token=$('#prev-button').data('token');
+var q=$('#prev-button').data('token');
+
+
+$('#results').html('');
+$('#buttons').html('');
+
+q=$('#query').val();
+
+$.get(
+"https://www.googleapis.com/youtube/v3/search",
+{
+part:'snippet,id',
+q:q,
+pageToken:token,
+type:'video',
+key:'AIzaSyBoHtRfujkOoQ6Z-8g38uuD7nx8PQbmN3M'
+
+
+},function(data)
+{
+
+var nextPageToken=data.nextPageToken;
+var prevPageToken=data.prevPageToken; 
+
+$.each(data.items,function(i,item){
+
+var output=getoutput(item);
+
+//Display Results
+$('#results').append(output);
+
+});
+
+var buttons=getButtons(prevPageToken,nextPageToken);
+
+//display buttons
+
+$('#buttons').append(buttons);
+
+
+}
+
+
+
+
+
+
+);//end of get
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+//output function
+
+function getoutput(item)
+{
+var videoId=item.id.videoId;
+var title=item.snippet.title;
+var description=item.snippet.description;
+var thumb=item.snippet.thumbnails.high.url;
+var channelTitle=item.snippet.channelTitle;
+var videoDate=item.snippet.publishedAt;
+
+//Build Output string
+
+var outp='<li>'+'<div class="list-left">'+'<img src="'+thumb+'">'+'</div>'+'<div class="list-right">'+'<h3><a class="fancybox fancybox.iframe"'+'href="https://www.youtube.com/embed/'+videoId+'">'+title+'</a></h3>'+'<small>By <span class="cTitle">'+channelTitle
++'</span> on '+videoDate+'</small>'+'<p>'+description+'</p>'+'</div>'+'</li>'+'<div classs="clearfix"></div>'+'';
+return outp;
+
+
+}
+
+
+
+//build the buttons
+
+
+
+function getButtons(prevPageToken,nextPageToken)
+{
+if(!prevPageToken)
+{
+var btnoutput='<div class="button-container">'+'<button id="next-button" class="paging-button" data-token="'+nextPageToken+'" data-query="'+q+'"'+'onclick="nextPage();">Next Page</button></div>';
+
+}
+else
+{
+var btnoutput='<div class="button-container">'+'<button id="prev-button" class="paging-button" data-token="'+prevPageToken+'" data-query="'+q+'"'+'onclick="prevPage();">Previous Page</button>'+'<button id="next-button" class="paging-button" data-token="'+nextPageToken+'" data-query="'+q+'"'+'onclick="nextPage();">Next Page</button></div>';
+
+}
+
+return btnoutput
+
+}
+
+
+</script>
+
+<!----End of the script Tag-->
+
+</head>
+
+<body>
+
+<div id="container">
+<header>
+
+<h1>Search<span>Vidz</span></h1>
+<p>Search all YouTube Videos</p>
+</header>
+
+<section>
+<form id="search-form" name="search-form" onsubmit="return search()">
+
+<div class="fieldcontainer">
+<input type="search" id="query" class="search-field" placeholder="Search Youtube..">
+<input type ="submit" name="search-btn" id="search-btn" value="">
+
+</div>
+</form>
+
+<ul id="results"></ul>
+<div id="buttons"></div>
+
+</section>
+<footer>
+<p>Copyright &copy;2014 ,All Rights Reserved</p>
+</footer>
+
+</div>
+
+</body>
+</html>
